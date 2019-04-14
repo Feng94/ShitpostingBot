@@ -1,5 +1,4 @@
 import * as Discord from 'discord.js';
-import request from 'request-promise-native';
 
 import * as tokenJson from './secret/token.json';
 import * as config from './secret/config.json';
