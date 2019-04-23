@@ -17,5 +17,9 @@ client.on('ready', () => {
   }, POLL_INTERVAL);
 });
 
+client.on('uncaughtException', (err) => {
+  console.log(err);
+});
+
 client.login(tokenJson.token);
 
