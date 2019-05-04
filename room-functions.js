@@ -22,7 +22,7 @@ const checkAndSendMessage = (info) => {
   if (roomInfoChanged(info, lastRoomInfo)) {
     deleteBotMessages()
         .then(() => {
-          sendMessage(info);
+          sendRoomMembersMessages(info);
         });
     lastRoomInfo = info;
   }
@@ -43,25 +43,36 @@ const deleteBotMessages = () => {
       .catch(console.error);
 };
 
-const sendMessage = (info) => {
+const sendRoomMembersMessages = (roomsObject) => {
+  const roomNames = Object.keys(roomsObject);
+  roomNames.sort();
+  roomNames.forEach((roomName) => {
+    botChannel.send(buildRoomEmbed(roomName, roomsObject[roomName]));
+  });
+};
+
+const buildRoomEmbed = (roomName, userList) => {
   const embed = new Discord.RichEmbed();
 
-  Object.keys(info).forEach((roomname) => {
-    let names = '';
-    let first = true;
-    const room = info[roomname];
-    room.sort();
-    room.forEach((nickName) => {
-      if (!first) {
-        names += ', ';
-      } else {
-        first = false;
-      }
-      names += nickName;
-    });
-    embed.addField(roomname, names);
+  // Build room title and link
+  embed.setTitle(roomName);
+  embed.setURL(config.jitsiServerBaseUrl + roomName);
+
+  // Build description (list of names)
+  let names = '';
+  let first = true;
+  userList.sort();
+  userList.forEach((nickName) => {
+    if (!first) {
+      names += '\n';
+    } else {
+      first = false;
+    }
+    names += nickName;
   });
-  botChannel.send(embed);
+  embed.setDescription(names);
+
+  return embed;
 };
 
 const getRoomUsersInfo = () => {
